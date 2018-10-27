@@ -1,0 +1,4 @@
+digraph {
+Forno_i [ label=" Forno\nForno_r\nForno_i " shape= box ]
+
+}

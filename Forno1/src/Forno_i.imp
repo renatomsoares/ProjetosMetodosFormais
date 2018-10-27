@@ -1,0 +1,167 @@
+﻿IMPLEMENTATION
+   Forno_i
+
+REFINES
+   Forno_r
+
+VALUES
+    INGREDIENTES = 0 .. 1890 ;
+    ALIMENTO = 0 .. 1890
+
+CONCRETE_VARIABLES
+   r_potencia ,
+   r_tempo ,
+   r_alimento ,
+   r_receita ,
+   r_ingredientes ,
+   r_estoque ,
+   r_trava ,
+   r_in_index ,
+   qtd_receita ,
+   qtd_alimento ,
+   qtd_ing_estoque
+
+INITIALISATION
+   r_potencia ( 0 ) := 0 ;
+   r_tempo ( 0 ) := 0 ;
+   r_estoque ( 0 ) := 0 ;
+   r_ingredientes ( 0 ) := 0 ;
+   r_receita ( 0 ) := 0 ;
+   r_alimento ( 0 ) := 0 ;
+   r_trava := 0 ;
+   r_in_index ( 0 ) := 1 ;
+   qtd_receita := 0 ;
+   qtd_alimento := 0 ;
+   qtd_ing_estoque := 0
+
+OPERATIONS
+   ee <-- numIngredientesNoEstoque =
+   ee := qtd_ing_estoque
+   ;
+
+   qq <-- qntIngredienteNoEstoque ( ii ) =
+   BEGIN
+       VAR
+           ingrediente , count
+       IN
+           ingrediente := 0 ; count := 0 ;
+           WHILE ingrediente /= ii DO
+               ingrediente := r_ingredientes ( r_in_index ( ii ) ) ;
+               count := count + 1
+           INVARIANT ingrediente : INGREDIENTES & count : NAT
+           VARIANT qtd_ing_estoque - count
+           END ;
+           qq := r_estoque ( count )
+       END
+
+   END
+   ;
+
+   travarForno =
+   BEGIN
+       r_trava := 0
+   END
+   ;
+
+   destravarForno =
+   BEGIN
+       r_trava := 1
+   END
+   ;
+
+   inserirNovoIngredienteNoEstoque ( qq , ii ) =
+   BEGIN
+       VAR
+           ingrediente , count , achou
+       IN
+           ingrediente := 0 ; count := 0 ; achou := 0 ;
+           WHILE count <= qtd_ing_estoque DO
+               IF count = ii THEN
+                   achou := 1
+               END ;
+               count := count + 1
+           INVARIANT ingrediente : INGREDIENTES & count : NAT
+           VARIANT qtd_ing_estoque - count
+           END ;
+           IF achou = 0 THEN
+               r_estoque ( qtd_ing_estoque + 1 ) := qq ;
+               r_in_index ( ii ) := qtd_ing_estoque + 1 ;
+               qtd_ing_estoque := qtd_ing_estoque + 1
+           END
+
+       END
+
+   END
+   ;
+
+   incrementarIngredienteDoEstoque ( qq , ii ) =
+   BEGIN
+       VAR
+           xx
+       IN
+           xx := r_estoque ( r_in_index ( ii ) ) + qq ;
+           IF xx < 10 THEN
+               r_estoque ( r_in_index ( ii ) ) := r_estoque ( r_in_index ( ii ) ) + qq
+           ELSE
+               r_estoque ( r_in_index ( ii ) ) := 10
+           END
+       END
+
+   END
+   ;
+
+   decrementarIngredienteDoEstoque ( qq , ii ) =
+   BEGIN
+       VAR
+           xx
+       IN
+           xx := r_estoque ( r_in_index ( ii ) ) - qq ;
+           IF xx > 0 THEN
+               r_estoque ( r_in_index ( ii ) ) := r_estoque ( r_in_index ( ii ) ) + qq
+           ELSE
+               r_estoque ( r_in_index ( ii ) ) := 0
+           END
+       END
+   END
+   ;
+
+   atualizarReceitaAdicinandoIngrediente ( ii , aa ) =
+   BEGIN
+        r_alimento ( qtd_alimento + 1 ) := r_receita ( aa ) ;
+        r_ingredientes ( qtd_alimento + 1 ) := ii ;
+        qtd_alimento := qtd_alimento + 1
+   END
+   ;
+
+   cadastrarReceita ( ii , aa , tt , pp ) =
+   BEGIN
+       r_receita ( aa ) := ( qtd_receita + 1 ) ;
+       r_alimento ( qtd_alimento + 1 ) := r_receita ( aa ) ;
+       r_ingredientes ( qtd_alimento + 1 ) := ii ;
+       r_tempo ( qtd_alimento + 1 ) := tt ;
+       r_potencia ( qtd_alimento + 1 ) := pp ;
+       qtd_receita := qtd_receita + 1 ;
+       qtd_alimento := qtd_alimento + 1
+   END
+   ;
+
+   fazerAlimento ( aa ) =
+   BEGIN
+      VAR
+           count
+       IN
+           count := 0 ;
+           WHILE count <= qtd_alimento DO
+                IF count = aa THEN
+                    r_estoque ( r_in_index ( r_ingredientes ( count ) ) ) := r_estoque ( r_in_index ( r_ingredientes ( count ) ) ) - 1
+                END ;
+                count := count + 1
+           INVARIANT count : NAT
+           VARIANT qtd_alimento - count
+           END
+
+       END
+   END
+
+
+END

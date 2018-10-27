@@ -1,0 +1,136 @@
+﻿REFINEMENT
+   Forno_r
+
+REFINES
+   Forno
+
+ABSTRACT_VARIABLES
+    r_potencia ,
+    r_tempo ,
+    r_alimento ,
+    r_receita ,
+    r_ingredientes ,
+    r_estoque ,
+    r_trava ,
+    existe ,
+    r_in_index ,
+    qtd_alimento ,
+    qtd_ing_estoque ,
+    qtd_receita
+
+INVARIANT
+    qtd_alimento : NAT &
+    qtd_ing_estoque : NAT &
+    qtd_receita : NAT &
+
+    existe : INGREDIENTES --> NAT &
+
+    r_in_index : INGREDIENTES --> NAT &
+
+    r_trava : NAT &
+
+    r_potencia : 0 .. 15 --> NAT1 &
+    r_potencia [ 0 .. 15 ] = ran ( potenciaR ) &
+
+    r_tempo : 0 .. 15 --> NAT1 &
+    r_tempo [ 0 .. 15 ] = ran ( temporizacaoR ) &
+
+    r_estoque : 0 .. 15 --> NAT &
+    r_estoque [ 0 .. 15 ] = ran ( estoqueR ) &
+
+    r_alimento : 0 .. 15 --> NAT &
+
+    r_ingredientes : 0 .. 15 --> INGREDIENTES &
+    r_receita : ALIMENTO --> NAT
+
+INITIALISATION
+    r_in_index := {} ;
+    r_potencia := [] ;
+    r_ingredientes := [] ;
+    r_tempo := [] ;
+    r_estoque := [] ;
+    r_receita := {} ;
+    r_alimento := [] ;
+    r_trava := 0 ;
+    qtd_alimento := 0 ;
+    qtd_ing_estoque := 0 ;
+    qtd_receita := 0 ;
+    existe := {}
+
+
+OPERATIONS
+   ee <-- numIngredientesNoEstoque =
+   ee := qtd_ing_estoque
+   ;
+
+   qq <-- qntIngredienteNoEstoque ( ii ) =
+   BEGIN
+       qq := r_estoque ( r_in_index ( ii ) )
+   END
+   ;
+
+   travarForno =
+   PRE r_trava = 1 THEN
+       r_trava := 0
+   END
+   ;
+
+   destravarForno =
+   PRE r_trava = 0 THEN
+       r_trava := 1
+   END
+   ;
+
+   inserirNovoIngredienteNoEstoque ( qq , ii ) =
+   BEGIN
+           IF existe ( ii ) = 0 THEN
+           r_estoque ( qtd_ing_estoque + 1 ) := qq ;
+           r_in_index ( ii ) := qtd_ing_estoque + 1 ;
+           qtd_ing_estoque := qtd_ing_estoque + 1 ;
+           existe ( ii ) := 1
+        ELSE
+           r_estoque ( r_in_index ( ii ) ) := r_estoque ( r_in_index ( ii ) ) + qq
+        END
+   END ;
+
+   incrementarIngredienteDoEstoque ( qq , ii ) =
+    BEGIN
+        r_estoque ( r_in_index ( ii ) ) := min ( { r_estoque ( r_in_index ( ii ) ) + qq , 10 } )
+    END ;
+
+
+    decrementarIngredienteDoEstoque ( qq , ii ) =
+    BEGIN
+        r_estoque ( r_in_index ( ii ) ) := max ( { r_estoque ( r_in_index ( ii ) ) - qq , 0 } )
+    END ;
+
+
+    atualizarReceitaAdicinandoIngrediente ( ii , aa ) =
+    BEGIN
+        r_alimento ( qtd_alimento + 1 ) := r_receita ( aa ) ;
+        r_ingredientes ( qtd_alimento + 1 ) := ii ;
+        qtd_alimento := qtd_alimento + 1
+    END ;
+
+
+    cadastrarReceita ( ii , aa , tt , pp ) =
+    BEGIN
+        r_receita ( aa ) := ( qtd_receita + 1 ) ;
+        r_alimento ( qtd_alimento + 1 ) := r_receita ( aa ) ;
+        r_ingredientes ( qtd_alimento + 1 ) := ii ;
+        r_tempo ( qtd_receita + 1 ) := tt ;
+        r_potencia ( qtd_receita + 1 ) := pp ;
+        qtd_alimento := qtd_alimento + 1 ;
+        qtd_receita := qtd_receita + 1
+    END ;
+
+
+    fazerAlimento ( aa ) =
+    PRE r_trava = 1 THEN
+        r_trava := 0 ;
+        ANY xx WHERE xx : ran ( r_alimento ) & xx = r_receita ( aa ) THEN
+           r_estoque ( r_in_index ( r_ingredientes ( xx ) ) ) := r_estoque ( r_in_index ( r_ingredientes ( xx ) ) ) - 1
+        END
+    END
+
+END
