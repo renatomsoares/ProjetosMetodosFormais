@@ -1,5 +1,5 @@
 THEORY BalanceX IS
-Forno_r,75,0,0,0,0,0,0;
+Forno_r,73,0,0,0,0,0,0;
 Initialisation,7,0,0,0,0,0,0;
 WellDefinedness_atualizarReceitaAdicinandoIngrediente,2,0,0,0,0,0,0;
 WellDefinedness_cadastrarReceita,2,0,0,0,0,0,0;
@@ -10,7 +10,6 @@ WellDefinedness_inserirNovoIngredienteNoEstoque,6,0,0,0,0,0,0;
 WellDefinedness_qntIngredienteNoEstoque,4,0,0,0,0,0,0;
 atualizarReceitaAdicinandoIngrediente,3,0,0,0,0,0,0;
 cadastrarReceita,9,0,0,0,0,0,0;
-decrementaTempo,2,0,0,0,0,0,0;
 decrementarIngredienteDoEstoque,2,0,0,0,0,0,0;
 destravarForno,2,0,0,0,0,0,0;
 fazerAlimento,2,0,0,0,0,0,0;
@@ -22,8 +21,6 @@ travarForno,2,0,0,0,0,0,0
 END
 &
 THEORY ProofState IS
-Unproved;
-Unproved;
 Unproved;
 Unproved;
 Unproved;
@@ -172,14 +169,10 @@ THEORY MethodList IS
 ?;
 ?;
 ?;
-?;
-?;
 ?
 END
 &
 THEORY PassList IS
-Force(0),?;
-Force(0),?;
 Force(0),?;
 Force(0),?;
 Force(0),?;

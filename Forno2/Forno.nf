@@ -37,9 +37,9 @@ THEORY ListVariablesX IS
   External_Context_List_Variables(Machine(Forno))==(?);
   Context_List_Variables(Machine(Forno))==(?);
   Abstract_List_Variables(Machine(Forno))==(?);
-  Local_List_Variables(Machine(Forno))==(qtdIng,tempoDeUso,index_in,pot,trav,cron,temporizacaoR,potenciaR,estoqueR,receita_in_qntR,receita_al_inR);
-  List_Variables(Machine(Forno))==(qtdIng,tempoDeUso,index_in,pot,trav,cron,temporizacaoR,potenciaR,estoqueR,receita_in_qntR,receita_al_inR);
-  External_List_Variables(Machine(Forno))==(qtdIng,tempoDeUso,index_in,pot,trav,cron,temporizacaoR,potenciaR,estoqueR,receita_in_qntR,receita_al_inR)
+  Local_List_Variables(Machine(Forno))==(tempoUso,index_ingrediente,potencia,trava,cronometro,estoque_ingrediente_quantidade,temporizador_alimento_valor,potencia_alimento_valor,receita_ingrediente_quantidade,receita_alimento_ingrediente);
+  List_Variables(Machine(Forno))==(tempoUso,index_ingrediente,potencia,trava,cronometro,estoque_ingrediente_quantidade,temporizador_alimento_valor,potencia_alimento_valor,receita_ingrediente_quantidade,receita_alimento_ingrediente);
+  External_List_Variables(Machine(Forno))==(tempoUso,index_ingrediente,potencia,trava,cronometro,estoque_ingrediente_quantidade,temporizador_alimento_valor,potencia_alimento_valor,receita_ingrediente_quantidade,receita_alimento_ingrediente)
 END
 &
 THEORY ListVisibleVariablesX IS
@@ -57,7 +57,7 @@ THEORY ListInvariantX IS
   Expanded_List_Invariant(Machine(Forno))==(btrue);
   Abstract_List_Invariant(Machine(Forno))==(btrue);
   Context_List_Invariant(Machine(Forno))==(btrue);
-  List_Invariant(Machine(Forno))==(receita_al_inR: ALIMENTO <-> POW(INGREDIENTES) & receita_in_qntR: POW(INGREDIENTES) <-> NAT1 & estoqueR: INGREDIENTES +-> 0..10 & potenciaR: ALIMENTO +-> NAT & temporizacaoR: ALIMENTO +-> NAT & cron: NAT & pot: NAT & trav: NAT & index_in: 0..card(dom(estoqueR)) +-> INGREDIENTES & tempoDeUso: NAT & qtdIng: 0..card(dom(estoqueR)))
+  List_Invariant(Machine(Forno))==(receita_alimento_ingrediente: ALIMENTO <-> POW(INGREDIENTES) & receita_ingrediente_quantidade: POW(INGREDIENTES) <-> NAT1 & estoque_ingrediente_quantidade: INGREDIENTES +-> 0..2000 & potencia_alimento_valor: ALIMENTO +-> 150..260 & temporizador_alimento_valor: ALIMENTO +-> 1..7200 & cronometro: 0..7200 & potencia: 0..260 & trava: NAT & index_ingrediente: 0..card(dom(estoque_ingrediente_quantidade)) +-> INGREDIENTES & tempoUso: 0..7200)
 END
 &
 THEORY ListAssertionsX IS
@@ -76,9 +76,9 @@ THEORY ListExclusivityX IS
 END
 &
 THEORY ListInitialisationX IS
-  Expanded_List_Initialisation(Machine(Forno))==(estoqueR,receita_al_inR,receita_in_qntR,temporizacaoR,potenciaR,cron,pot,trav,index_in,tempoDeUso,qtdIng:={},{},{},{},{},0,0,0,{},0,0);
+  Expanded_List_Initialisation(Machine(Forno))==(estoque_ingrediente_quantidade,receita_alimento_ingrediente,receita_ingrediente_quantidade,temporizador_alimento_valor,potencia_alimento_valor,cronometro,potencia,trava,index_ingrediente,tempoUso:={},{},{},{},{},0,0,0,{},0);
   Context_List_Initialisation(Machine(Forno))==(skip);
-  List_Initialisation(Machine(Forno))==(estoqueR:={} || receita_al_inR:={} || receita_in_qntR:={} || temporizacaoR:={} || potenciaR:={} || cron:=0 || pot:=0 || trav:=0 || index_in:={} || tempoDeUso:=0 || qtdIng:=0)
+  List_Initialisation(Machine(Forno))==(estoque_ingrediente_quantidade:={} || receita_alimento_ingrediente:={} || receita_ingrediente_quantidade:={} || temporizador_alimento_valor:={} || potencia_alimento_valor:={} || cronometro:=0 || potencia:=0 || trava:=0 || index_ingrediente:={} || tempoUso:=0)
 END
 &
 THEORY ListParametersX IS
@@ -93,8 +93,8 @@ THEORY ListConstraintsX IS
 END
 &
 THEORY ListOperationsX IS
-  Internal_List_Operations(Machine(Forno))==(numIngredientesNoEstoque,qntIngredienteNoEstoque,travarForno,destravarForno,inserirNovoIngredienteNoEstoque,incrementarIngredienteDoEstoque,decrementarIngredienteDoEstoque,atualizarReceitaAdicinandoIngrediente,cadastrarReceita,fazerAlimento);
-  List_Operations(Machine(Forno))==(numIngredientesNoEstoque,qntIngredienteNoEstoque,travarForno,destravarForno,inserirNovoIngredienteNoEstoque,incrementarIngredienteDoEstoque,decrementarIngredienteDoEstoque,atualizarReceitaAdicinandoIngrediente,cadastrarReceita,fazerAlimento)
+  Internal_List_Operations(Machine(Forno))==(numIngredientesNoEstoque,qntIngredienteNoEstoque,travarForno,destravarForno,decrementaTempo,inserirNovoIngredienteNoEstoque,incrementarIngredienteDoEstoque,decrementarIngredienteDoEstoque,atualizarReceitaAdicinandoIngrediente,cadastrarReceita,fazerAlimento);
+  List_Operations(Machine(Forno))==(numIngredientesNoEstoque,qntIngredienteNoEstoque,travarForno,destravarForno,decrementaTempo,inserirNovoIngredienteNoEstoque,incrementarIngredienteDoEstoque,decrementarIngredienteDoEstoque,atualizarReceitaAdicinandoIngrediente,cadastrarReceita,fazerAlimento)
 END
 &
 THEORY ListInputX IS
@@ -102,6 +102,7 @@ THEORY ListInputX IS
   List_Input(Machine(Forno),qntIngredienteNoEstoque)==(ii);
   List_Input(Machine(Forno),travarForno)==(?);
   List_Input(Machine(Forno),destravarForno)==(?);
+  List_Input(Machine(Forno),decrementaTempo)==(?);
   List_Input(Machine(Forno),inserirNovoIngredienteNoEstoque)==(qq,ii);
   List_Input(Machine(Forno),incrementarIngredienteDoEstoque)==(qq,ii);
   List_Input(Machine(Forno),decrementarIngredienteDoEstoque)==(qq,ii);
@@ -115,6 +116,7 @@ THEORY ListOutputX IS
   List_Output(Machine(Forno),qntIngredienteNoEstoque)==(qq);
   List_Output(Machine(Forno),travarForno)==(?);
   List_Output(Machine(Forno),destravarForno)==(?);
+  List_Output(Machine(Forno),decrementaTempo)==(?);
   List_Output(Machine(Forno),inserirNovoIngredienteNoEstoque)==(?);
   List_Output(Machine(Forno),incrementarIngredienteDoEstoque)==(?);
   List_Output(Machine(Forno),decrementarIngredienteDoEstoque)==(?);
@@ -128,6 +130,7 @@ THEORY ListHeaderX IS
   List_Header(Machine(Forno),qntIngredienteNoEstoque)==(qq <-- qntIngredienteNoEstoque(ii));
   List_Header(Machine(Forno),travarForno)==(travarForno);
   List_Header(Machine(Forno),destravarForno)==(destravarForno);
+  List_Header(Machine(Forno),decrementaTempo)==(decrementaTempo);
   List_Header(Machine(Forno),inserirNovoIngredienteNoEstoque)==(inserirNovoIngredienteNoEstoque(qq,ii));
   List_Header(Machine(Forno),incrementarIngredienteDoEstoque)==(incrementarIngredienteDoEstoque(qq,ii));
   List_Header(Machine(Forno),decrementarIngredienteDoEstoque)==(decrementarIngredienteDoEstoque(qq,ii));
@@ -140,38 +143,41 @@ THEORY ListOperationGuardX END
 &
 THEORY ListPreconditionX IS
   List_Precondition(Machine(Forno),numIngredientesNoEstoque)==(btrue);
-  List_Precondition(Machine(Forno),qntIngredienteNoEstoque)==(ii: INGREDIENTES & ii: dom(estoqueR));
-  List_Precondition(Machine(Forno),travarForno)==(trav = 1);
-  List_Precondition(Machine(Forno),destravarForno)==(trav = 0);
-  List_Precondition(Machine(Forno),inserirNovoIngredienteNoEstoque)==(ii: INGREDIENTES & qq: NAT & qq<10 & qq>0 & ii/:dom(estoqueR));
-  List_Precondition(Machine(Forno),incrementarIngredienteDoEstoque)==(ii: INGREDIENTES & qq: NAT & qq<10 & qq>0 & ii: dom(estoqueR) & estoqueR(ii)<10);
-  List_Precondition(Machine(Forno),decrementarIngredienteDoEstoque)==(ii: INGREDIENTES & qq: NAT & qq<10 & qq>0 & ii: dom(estoqueR) & estoqueR(ii)<10);
-  List_Precondition(Machine(Forno),atualizarReceitaAdicinandoIngrediente)==(ii: INGREDIENTES & aa: ALIMENTO & aa: dom(temporizacaoR) & aa: dom(potenciaR));
-  List_Precondition(Machine(Forno),cadastrarReceita)==(ii: INGREDIENTES & aa: ALIMENTO & tt: NAT1 & pp: NAT1 & aa/:dom(temporizacaoR) & aa/:dom(potenciaR));
-  List_Precondition(Machine(Forno),fazerAlimento)==(aa: ALIMENTO & aa: dom(receita_al_inR) & trav = 1 & tempoDeUso<MAXINT)
+  List_Precondition(Machine(Forno),qntIngredienteNoEstoque)==(ii: INGREDIENTES & ii: dom(estoque_ingrediente_quantidade));
+  List_Precondition(Machine(Forno),travarForno)==(trava = 0);
+  List_Precondition(Machine(Forno),destravarForno)==(trava = 1 & cronometro = 0);
+  List_Precondition(Machine(Forno),decrementaTempo)==(cronometro>0);
+  List_Precondition(Machine(Forno),inserirNovoIngredienteNoEstoque)==(ii: INGREDIENTES & qq: NAT & qq<2000 & qq>0 & ii/:dom(estoque_ingrediente_quantidade) & trava = 0);
+  List_Precondition(Machine(Forno),incrementarIngredienteDoEstoque)==(ii: INGREDIENTES & qq: NAT & qq<2000 & qq>0 & ii: dom(estoque_ingrediente_quantidade) & estoque_ingrediente_quantidade(ii)<2000 & trava = 0);
+  List_Precondition(Machine(Forno),decrementarIngredienteDoEstoque)==(ii: INGREDIENTES & qq: NAT & qq<2000 & qq>0 & ii: dom(estoque_ingrediente_quantidade) & trava = 0 & estoque_ingrediente_quantidade(ii)<2000);
+  List_Precondition(Machine(Forno),atualizarReceitaAdicinandoIngrediente)==(ii: INGREDIENTES & aa: ALIMENTO & aa: dom(temporizador_alimento_valor) & aa: dom(potencia_alimento_valor) & trava = 0);
+  List_Precondition(Machine(Forno),cadastrarReceita)==(ii: INGREDIENTES & aa: ALIMENTO & tt: 1..7200 & pp: 150..260 & aa/:dom(temporizador_alimento_valor) & aa/:dom(potencia_alimento_valor) & trava = 0);
+  List_Precondition(Machine(Forno),fazerAlimento)==(aa: ALIMENTO & aa: dom(receita_alimento_ingrediente) & trava = 0)
 END
 &
 THEORY ListSubstitutionX IS
-  Expanded_List_Substitution(Machine(Forno),fazerAlimento)==(aa: ALIMENTO & aa: dom(receita_al_inR) & trav = 1 & tempoDeUso<MAXINT | cron,trav,tempoDeUso:=0,0,tempoDeUso+temporizacaoR(aa) || @yy.(yy: receita_al_inR(aa) ==> (estoqueR(yy)>0 ==> estoqueR:=estoqueR<+{yy|->max({estoqueR(yy)-1,0})} [] not(estoqueR(yy)>0) ==> skip)));
-  Expanded_List_Substitution(Machine(Forno),cadastrarReceita)==(ii: INGREDIENTES & aa: ALIMENTO & tt: NAT1 & pp: NAT1 & aa/:dom(temporizacaoR) & aa/:dom(potenciaR) | receita_al_inR,temporizacaoR,potenciaR:=receita_al_inR\/{aa|->{}},temporizacaoR\/{aa|->tt},potenciaR\/{aa|->pp});
-  Expanded_List_Substitution(Machine(Forno),atualizarReceitaAdicinandoIngrediente)==(ii: INGREDIENTES & aa: ALIMENTO & aa: dom(temporizacaoR) & aa: dom(potenciaR) | receita_al_inR:=receita_al_inR<+{aa|->(receita_al_inR(aa)\/{ii})});
-  Expanded_List_Substitution(Machine(Forno),decrementarIngredienteDoEstoque)==(ii: INGREDIENTES & qq: NAT & qq<10 & qq>0 & ii: dom(estoqueR) & estoqueR(ii)<10 | estoqueR:=estoqueR<+{ii|->max({estoqueR(ii)-qq,0})});
-  Expanded_List_Substitution(Machine(Forno),incrementarIngredienteDoEstoque)==(ii: INGREDIENTES & qq: NAT & qq<10 & qq>0 & ii: dom(estoqueR) & estoqueR(ii)<10 | estoqueR:=estoqueR<+{ii|->min({estoqueR(ii)+qq,10})});
-  Expanded_List_Substitution(Machine(Forno),inserirNovoIngredienteNoEstoque)==(ii: INGREDIENTES & qq: NAT & qq<10 & qq>0 & ii/:dom(estoqueR) | ii/:dom(estoqueR) ==> estoqueR,index_in:=estoqueR\/{ii|->qq},index_in\/{card(dom(estoqueR))|->ii} [] not(ii/:dom(estoqueR)) ==> skip);
-  Expanded_List_Substitution(Machine(Forno),destravarForno)==(trav = 0 | trav:=1);
-  Expanded_List_Substitution(Machine(Forno),travarForno)==(trav = 1 | trav:=0);
-  Expanded_List_Substitution(Machine(Forno),qntIngredienteNoEstoque)==(ii: INGREDIENTES & ii: dom(estoqueR) | qq:=estoqueR(ii));
-  Expanded_List_Substitution(Machine(Forno),numIngredientesNoEstoque)==(btrue | ee:=card(dom(estoqueR)));
-  List_Substitution(Machine(Forno),numIngredientesNoEstoque)==(ee:=card(dom(estoqueR)));
-  List_Substitution(Machine(Forno),qntIngredienteNoEstoque)==(qq:=estoqueR(ii));
-  List_Substitution(Machine(Forno),travarForno)==(trav:=0);
-  List_Substitution(Machine(Forno),destravarForno)==(trav:=1);
-  List_Substitution(Machine(Forno),inserirNovoIngredienteNoEstoque)==(IF ii/:dom(estoqueR) THEN estoqueR:=estoqueR\/{ii|->qq} || index_in:=index_in\/{card(dom(estoqueR))|->ii} END);
-  List_Substitution(Machine(Forno),incrementarIngredienteDoEstoque)==(estoqueR:=estoqueR<+{ii|->min({estoqueR(ii)+qq,10})});
-  List_Substitution(Machine(Forno),decrementarIngredienteDoEstoque)==(estoqueR:=estoqueR<+{ii|->max({estoqueR(ii)-qq,0})});
-  List_Substitution(Machine(Forno),atualizarReceitaAdicinandoIngrediente)==(receita_al_inR:=receita_al_inR<+{aa|->(receita_al_inR(aa)\/{ii})});
-  List_Substitution(Machine(Forno),cadastrarReceita)==(receita_al_inR:=receita_al_inR\/{aa|->{}} || temporizacaoR:=temporizacaoR\/{aa|->tt} || potenciaR:=potenciaR\/{aa|->pp});
-  List_Substitution(Machine(Forno),fazerAlimento)==(cron:=0 || trav:=0 || tempoDeUso:=tempoDeUso+temporizacaoR(aa) || ANY yy WHERE yy: receita_al_inR(aa) THEN IF estoqueR(yy)>0 THEN estoqueR:=estoqueR<+{yy|->max({estoqueR(yy)-1,0})} END END)
+  Expanded_List_Substitution(Machine(Forno),fazerAlimento)==(aa: ALIMENTO & aa: dom(receita_alimento_ingrediente) & trava = 0 | trava,cronometro:=1,temporizador_alimento_valor(aa) || @yy.(yy: receita_alimento_ingrediente(aa) ==> (estoque_ingrediente_quantidade(yy)>0 ==> estoque_ingrediente_quantidade:=estoque_ingrediente_quantidade<+{yy|->max({estoque_ingrediente_quantidade(yy)-1,0})} [] not(estoque_ingrediente_quantidade(yy)>0) ==> skip)));
+  Expanded_List_Substitution(Machine(Forno),cadastrarReceita)==(ii: INGREDIENTES & aa: ALIMENTO & tt: 1..7200 & pp: 150..260 & aa/:dom(temporizador_alimento_valor) & aa/:dom(potencia_alimento_valor) & trava = 0 | receita_alimento_ingrediente,temporizador_alimento_valor,potencia_alimento_valor:=receita_alimento_ingrediente\/{aa|->{}},temporizador_alimento_valor\/{aa|->tt},potencia_alimento_valor\/{aa|->pp});
+  Expanded_List_Substitution(Machine(Forno),atualizarReceitaAdicinandoIngrediente)==(ii: INGREDIENTES & aa: ALIMENTO & aa: dom(temporizador_alimento_valor) & aa: dom(potencia_alimento_valor) & trava = 0 | receita_alimento_ingrediente:=receita_alimento_ingrediente<+{aa|->(receita_alimento_ingrediente(aa)\/{ii})});
+  Expanded_List_Substitution(Machine(Forno),decrementarIngredienteDoEstoque)==(ii: INGREDIENTES & qq: NAT & qq<2000 & qq>0 & ii: dom(estoque_ingrediente_quantidade) & trava = 0 & estoque_ingrediente_quantidade(ii)<2000 | estoque_ingrediente_quantidade:=estoque_ingrediente_quantidade<+{ii|->max({estoque_ingrediente_quantidade(ii)-qq,0})});
+  Expanded_List_Substitution(Machine(Forno),incrementarIngredienteDoEstoque)==(ii: INGREDIENTES & qq: NAT & qq<2000 & qq>0 & ii: dom(estoque_ingrediente_quantidade) & estoque_ingrediente_quantidade(ii)<2000 & trava = 0 | estoque_ingrediente_quantidade:=estoque_ingrediente_quantidade<+{ii|->min({estoque_ingrediente_quantidade(ii)+qq,2000})});
+  Expanded_List_Substitution(Machine(Forno),inserirNovoIngredienteNoEstoque)==(ii: INGREDIENTES & qq: NAT & qq<2000 & qq>0 & ii/:dom(estoque_ingrediente_quantidade) & trava = 0 | ii/:dom(estoque_ingrediente_quantidade) ==> estoque_ingrediente_quantidade,index_ingrediente:=estoque_ingrediente_quantidade\/{ii|->qq},index_ingrediente\/{card(dom(estoque_ingrediente_quantidade))|->ii} [] not(ii/:dom(estoque_ingrediente_quantidade)) ==> skip);
+  Expanded_List_Substitution(Machine(Forno),decrementaTempo)==(cronometro>0 | cronometro:=cronometro-1);
+  Expanded_List_Substitution(Machine(Forno),destravarForno)==(trava = 1 & cronometro = 0 | trava:=0);
+  Expanded_List_Substitution(Machine(Forno),travarForno)==(trava = 0 | trava:=1);
+  Expanded_List_Substitution(Machine(Forno),qntIngredienteNoEstoque)==(ii: INGREDIENTES & ii: dom(estoque_ingrediente_quantidade) | qq:=estoque_ingrediente_quantidade(ii));
+  Expanded_List_Substitution(Machine(Forno),numIngredientesNoEstoque)==(btrue | ee:=card(dom(estoque_ingrediente_quantidade)));
+  List_Substitution(Machine(Forno),numIngredientesNoEstoque)==(ee:=card(dom(estoque_ingrediente_quantidade)));
+  List_Substitution(Machine(Forno),qntIngredienteNoEstoque)==(qq:=estoque_ingrediente_quantidade(ii));
+  List_Substitution(Machine(Forno),travarForno)==(trava:=1);
+  List_Substitution(Machine(Forno),destravarForno)==(trava:=0);
+  List_Substitution(Machine(Forno),decrementaTempo)==(cronometro:=cronometro-1);
+  List_Substitution(Machine(Forno),inserirNovoIngredienteNoEstoque)==(IF ii/:dom(estoque_ingrediente_quantidade) THEN estoque_ingrediente_quantidade:=estoque_ingrediente_quantidade\/{ii|->qq} || index_ingrediente:=index_ingrediente\/{card(dom(estoque_ingrediente_quantidade))|->ii} END);
+  List_Substitution(Machine(Forno),incrementarIngredienteDoEstoque)==(estoque_ingrediente_quantidade:=estoque_ingrediente_quantidade<+{ii|->min({estoque_ingrediente_quantidade(ii)+qq,2000})});
+  List_Substitution(Machine(Forno),decrementarIngredienteDoEstoque)==(estoque_ingrediente_quantidade:=estoque_ingrediente_quantidade<+{ii|->max({estoque_ingrediente_quantidade(ii)-qq,0})});
+  List_Substitution(Machine(Forno),atualizarReceitaAdicinandoIngrediente)==(receita_alimento_ingrediente:=receita_alimento_ingrediente<+{aa|->(receita_alimento_ingrediente(aa)\/{ii})});
+  List_Substitution(Machine(Forno),cadastrarReceita)==(receita_alimento_ingrediente:=receita_alimento_ingrediente\/{aa|->{}} || temporizador_alimento_valor:=temporizador_alimento_valor\/{aa|->tt} || potencia_alimento_valor:=potencia_alimento_valor\/{aa|->pp});
+  List_Substitution(Machine(Forno),fazerAlimento)==(trava:=1 || cronometro:=temporizador_alimento_valor(aa) || ANY yy WHERE yy: receita_alimento_ingrediente(aa) THEN IF estoque_ingrediente_quantidade(yy)>0 THEN estoque_ingrediente_quantidade:=estoque_ingrediente_quantidade<+{yy|->max({estoque_ingrediente_quantidade(yy)-1,0})} END END)
 END
 &
 THEORY ListConstantsX IS
@@ -216,6 +222,7 @@ THEORY ListANYVarX IS
   List_ANY_Var(Machine(Forno),qntIngredienteNoEstoque)==(?);
   List_ANY_Var(Machine(Forno),travarForno)==(?);
   List_ANY_Var(Machine(Forno),destravarForno)==(?);
+  List_ANY_Var(Machine(Forno),decrementaTempo)==(?);
   List_ANY_Var(Machine(Forno),inserirNovoIngredienteNoEstoque)==(?);
   List_ANY_Var(Machine(Forno),incrementarIngredienteDoEstoque)==(?);
   List_ANY_Var(Machine(Forno),decrementarIngredienteDoEstoque)==(?);
@@ -225,7 +232,7 @@ THEORY ListANYVarX IS
 END
 &
 THEORY ListOfIdsX IS
-  List_Of_Ids(Machine(Forno)) == (INGREDIENTES,ALIMENTO | ? | qtdIng,tempoDeUso,index_in,pot,trav,cron,temporizacaoR,potenciaR,estoqueR,receita_in_qntR,receita_al_inR | ? | numIngredientesNoEstoque,qntIngredienteNoEstoque,travarForno,destravarForno,inserirNovoIngredienteNoEstoque,incrementarIngredienteDoEstoque,decrementarIngredienteDoEstoque,atualizarReceitaAdicinandoIngrediente,cadastrarReceita,fazerAlimento | ? | ? | ? | Forno);
+  List_Of_Ids(Machine(Forno)) == (INGREDIENTES,ALIMENTO | ? | tempoUso,index_ingrediente,potencia,trava,cronometro,estoque_ingrediente_quantidade,temporizador_alimento_valor,potencia_alimento_valor,receita_ingrediente_quantidade,receita_alimento_ingrediente | ? | numIngredientesNoEstoque,qntIngredienteNoEstoque,travarForno,destravarForno,decrementaTempo,inserirNovoIngredienteNoEstoque,incrementarIngredienteDoEstoque,decrementarIngredienteDoEstoque,atualizarReceitaAdicinandoIngrediente,cadastrarReceita,fazerAlimento | ? | ? | ? | Forno);
   List_Of_HiddenCst_Ids(Machine(Forno)) == (? | ?);
   List_Of_VisibleCst_Ids(Machine(Forno)) == (?);
   List_Of_VisibleVar_Ids(Machine(Forno)) == (? | ?);
@@ -237,11 +244,11 @@ THEORY SetsEnvX IS
 END
 &
 THEORY VariablesEnvX IS
-  Variables(Machine(Forno)) == (Type(qtdIng) == Mvl(btype(INTEGER,?,?));Type(tempoDeUso) == Mvl(btype(INTEGER,?,?));Type(index_in) == Mvl(SetOf(btype(INTEGER,?,?)*atype(INGREDIENTES,?,?)));Type(pot) == Mvl(btype(INTEGER,?,?));Type(trav) == Mvl(btype(INTEGER,?,?));Type(cron) == Mvl(btype(INTEGER,?,?));Type(temporizacaoR) == Mvl(SetOf(atype(ALIMENTO,?,?)*btype(INTEGER,?,?)));Type(potenciaR) == Mvl(SetOf(atype(ALIMENTO,?,?)*btype(INTEGER,?,?)));Type(estoqueR) == Mvl(SetOf(atype(INGREDIENTES,?,?)*btype(INTEGER,?,?)));Type(receita_in_qntR) == Mvl(SetOf(SetOf(atype(INGREDIENTES,?,?))*btype(INTEGER,?,?)));Type(receita_al_inR) == Mvl(SetOf(atype(ALIMENTO,?,?)*SetOf(atype(INGREDIENTES,?,?)))))
+  Variables(Machine(Forno)) == (Type(tempoUso) == Mvl(btype(INTEGER,?,?));Type(index_ingrediente) == Mvl(SetOf(btype(INTEGER,?,?)*atype(INGREDIENTES,?,?)));Type(potencia) == Mvl(btype(INTEGER,?,?));Type(trava) == Mvl(btype(INTEGER,?,?));Type(cronometro) == Mvl(btype(INTEGER,?,?));Type(estoque_ingrediente_quantidade) == Mvl(SetOf(atype(INGREDIENTES,?,?)*btype(INTEGER,?,?)));Type(temporizador_alimento_valor) == Mvl(SetOf(atype(ALIMENTO,?,?)*btype(INTEGER,?,?)));Type(potencia_alimento_valor) == Mvl(SetOf(atype(ALIMENTO,?,?)*btype(INTEGER,?,?)));Type(receita_ingrediente_quantidade) == Mvl(SetOf(SetOf(atype(INGREDIENTES,?,?))*btype(INTEGER,?,?)));Type(receita_alimento_ingrediente) == Mvl(SetOf(atype(ALIMENTO,?,?)*SetOf(atype(INGREDIENTES,?,?)))))
 END
 &
 THEORY OperationsEnvX IS
-  Operations(Machine(Forno)) == (Type(fazerAlimento) == Cst(No_type,atype(ALIMENTO,?,?));Type(cadastrarReceita) == Cst(No_type,atype(INGREDIENTES,?,?)*atype(ALIMENTO,?,?)*btype(INTEGER,?,?)*btype(INTEGER,?,?));Type(atualizarReceitaAdicinandoIngrediente) == Cst(No_type,atype(INGREDIENTES,?,?)*atype(ALIMENTO,?,?));Type(decrementarIngredienteDoEstoque) == Cst(No_type,btype(INTEGER,?,?)*atype(INGREDIENTES,?,?));Type(incrementarIngredienteDoEstoque) == Cst(No_type,btype(INTEGER,?,?)*atype(INGREDIENTES,?,?));Type(inserirNovoIngredienteNoEstoque) == Cst(No_type,btype(INTEGER,?,?)*atype(INGREDIENTES,?,?));Type(destravarForno) == Cst(No_type,No_type);Type(travarForno) == Cst(No_type,No_type);Type(qntIngredienteNoEstoque) == Cst(btype(INTEGER,?,?),atype(INGREDIENTES,?,?));Type(numIngredientesNoEstoque) == Cst(btype(INTEGER,?,?),No_type));
+  Operations(Machine(Forno)) == (Type(fazerAlimento) == Cst(No_type,atype(ALIMENTO,?,?));Type(cadastrarReceita) == Cst(No_type,atype(INGREDIENTES,?,?)*atype(ALIMENTO,?,?)*btype(INTEGER,?,?)*btype(INTEGER,?,?));Type(atualizarReceitaAdicinandoIngrediente) == Cst(No_type,atype(INGREDIENTES,?,?)*atype(ALIMENTO,?,?));Type(decrementarIngredienteDoEstoque) == Cst(No_type,btype(INTEGER,?,?)*atype(INGREDIENTES,?,?));Type(incrementarIngredienteDoEstoque) == Cst(No_type,btype(INTEGER,?,?)*atype(INGREDIENTES,?,?));Type(inserirNovoIngredienteNoEstoque) == Cst(No_type,btype(INTEGER,?,?)*atype(INGREDIENTES,?,?));Type(decrementaTempo) == Cst(No_type,No_type);Type(destravarForno) == Cst(No_type,No_type);Type(travarForno) == Cst(No_type,No_type);Type(qntIngredienteNoEstoque) == Cst(btype(INTEGER,?,?),atype(INGREDIENTES,?,?));Type(numIngredientesNoEstoque) == Cst(btype(INTEGER,?,?),No_type));
   Observers(Machine(Forno)) == (Type(qntIngredienteNoEstoque) == Cst(btype(INTEGER,?,?),atype(INGREDIENTES,?,?));Type(numIngredientesNoEstoque) == Cst(btype(INTEGER,?,?),No_type))
 END
 &

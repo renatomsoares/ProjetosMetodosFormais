@@ -19,7 +19,8 @@ CONCRETE_VARIABLES
    r_in_index ,
    qtd_receita ,
    qtd_alimento ,
-   qtd_ing_estoque
+   qtd_ing_estoque ,
+   r_cronometro
 
 INITIALISATION
    r_potencia ( 0 ) := 0 ;
@@ -32,7 +33,8 @@ INITIALISATION
    r_in_index ( 0 ) := 1 ;
    qtd_receita := 0 ;
    qtd_alimento := 0 ;
-   qtd_ing_estoque := 0
+   qtd_ing_estoque := 0 ;
+   r_cronometro := 0
 
 OPERATIONS
    ee <-- numIngredientesNoEstoque =
@@ -68,6 +70,11 @@ OPERATIONS
        r_trava := 1
    END
    ;
+
+    decrementaTempo =
+       BEGIN
+           r_cronometro := r_cronometro - 1
+       END ;
 
    inserirNovoIngredienteNoEstoque ( qq , ii ) =
    BEGIN

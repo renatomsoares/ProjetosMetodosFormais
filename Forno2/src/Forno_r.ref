@@ -16,7 +16,8 @@ ABSTRACT_VARIABLES
     r_in_index ,
     qtd_alimento ,
     qtd_ing_estoque ,
-    qtd_receita
+    qtd_receita ,
+    r_cronometro
 
 INVARIANT
     qtd_alimento : NAT &
@@ -30,18 +31,19 @@ INVARIANT
     r_trava : NAT &
 
     r_potencia : 0 .. 15 --> NAT1 &
-    r_potencia [ 0 .. 15 ] = ran ( potenciaR ) &
+    r_potencia [ 0 .. 15 ] = ran ( potencia_alimento_valor ) &
 
     r_tempo : 0 .. 15 --> NAT1 &
-    r_tempo [ 0 .. 15 ] = ran ( temporizacaoR ) &
+    r_tempo [ 0 .. 15 ] = ran ( temporizador_alimento_valor ) &
 
     r_estoque : 0 .. 15 --> NAT &
-    r_estoque [ 0 .. 15 ] = ran ( estoqueR ) &
+    r_estoque [ 0 .. 15 ] = ran ( estoque_ingrediente_quantidade ) &
 
     r_alimento : 0 .. 15 --> NAT &
 
     r_ingredientes : 0 .. 15 --> INGREDIENTES &
-    r_receita : ALIMENTO --> NAT
+    r_receita : ALIMENTO --> NAT &
+    r_cronometro : NAT
 
 INITIALISATION
     r_in_index := {} ;
@@ -55,7 +57,8 @@ INITIALISATION
     qtd_alimento := 0 ;
     qtd_ing_estoque := 0 ;
     qtd_receita := 0 ;
-    existe := {}
+    existe := {} ;
+    r_cronometro := 0
 
 
 OPERATIONS
@@ -80,6 +83,11 @@ OPERATIONS
        r_trava := 1
    END
    ;
+
+  decrementaTempo =
+        PRE r_cronometro > 0
+        THEN r_cronometro := r_cronometro - 1
+        END ;
 
    inserirNovoIngredienteNoEstoque ( qq , ii ) =
    BEGIN
@@ -112,7 +120,6 @@ OPERATIONS
         qtd_alimento := qtd_alimento + 1
     END ;
 
-
     cadastrarReceita ( ii , aa , tt , pp ) =
     BEGIN
         r_receita ( aa ) := ( qtd_receita + 1 ) ;
@@ -123,7 +130,6 @@ OPERATIONS
         qtd_alimento := qtd_alimento + 1 ;
         qtd_receita := qtd_receita + 1
     END ;
-
 
     fazerAlimento ( aa ) =
     PRE r_trava = 1 THEN
